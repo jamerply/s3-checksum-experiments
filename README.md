@@ -6,9 +6,9 @@ SHA256 checksum with a locally-calculated checksum.
 
 ## Requirements
 
-`dd`: 9.6+
-`ruby`: 3.2+
-AWS Credentials configured using `aws configure`, environment variables, or other method
+- `dd`: 9.6+
+- `ruby`: 3.2+
+- AWS Credentials configured using `aws configure`, environment variables, or other method
 
 ## Getting started
 
