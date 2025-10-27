@@ -1,4 +1,4 @@
-# S3 Checksum Experiements
+# S3 Checksum Experiments
 
 A test program written in Ruby for uploading an object to S3 and comparing the S3-calculated
 SHA256 checksum with a locally-calculated checksum.
