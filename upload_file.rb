@@ -55,7 +55,7 @@ class S3_Object
   end
 
   def get_s3_client()
-    @s3_client ||= Aws::S3::Client.new
+    Aws::S3::Client.new
   end
 end
 
