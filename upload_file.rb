@@ -3,12 +3,14 @@
 require "aws-sdk-s3"
 require "digest"
 require "base64"
+require "logger"
 
 class Local_File
   attr_reader :path
 
   def initialize(path)
     @path = path
+    @logger = Logger.new($stdout)
   end
 
   def calculate_sha256()
@@ -26,10 +28,10 @@ class Local_File
     tm = Aws::S3::TransferManager.new
     begin
       tm.upload_file(@path, bucket: bucket_name, key: object_key, **options)
-      puts "File #{@path} successfully uploaded to #{bucket_name}:#{object_key}."
+      @logger.info("File #{@path} successfully uploaded to #{bucket_name}:#{object_key}.")
       true
     rescue StandardError => e
-      puts "Upload failed: #{e.message}"
+      @logger.error("Upload failed: #{e.message}")
       false
     end
   end
@@ -41,6 +43,7 @@ class S3_Object
   def initialize(bucket_name, object_key)
     @bucket_name = bucket_name
     @object_key = object_key
+    @logger = Logger.new($stdout)
   end
 
   def get_sha256()
@@ -60,6 +63,8 @@ class S3_Object
 end
 
 def run_test
+  logger = Logger.new($stdout)
+  
   bucket_name = ARGV[0]
   object_key = ARGV[1]
   file_path = ARGV[2]
@@ -73,19 +78,19 @@ def run_test
   end_time = Process.clock_gettime(Process::CLOCK_MONOTONIC)
   duration = end_time - start_time
 
-  puts "Upload completed in #{duration.round(2)} seconds."
-  
-  puts "Comparing checksums..."
+  logger.debug("Upload completed in #{duration.round(2)} seconds.")
+
+  logger.info("Comparing checksums...")
   local_checksum = local_file.calculate_sha256()
   s3_checksum = S3_Object.new(bucket_name, object_key).get_sha256()
 
   if local_checksum == s3_checksum
-    puts "Checksums match!"
-    puts "Checksum: #{local_checksum}"
+    logger.info("Checksums match!")
+    logger.debug("Checksum: #{local_checksum}")
   else
-    puts "Checksums do not match!"
-    puts "Local: #{local_checksum}"
-    puts "S3:    #{s3_checksum}"
+    logger.warning("Checksums do not match!")
+    logger.debug("Local: #{local_checksum}")
+    logger.debug("S3:    #{s3_checksum}")
   end
 end
 
