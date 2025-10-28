@@ -43,7 +43,7 @@ class S3_Object
     @object_key = object_key
   end
 
-  def get_s3_object_sha256()
+  def get_sha256()
     s3_client = get_s3_client()
     resp = s3_client.get_object_attributes(bucket: @bucket_name, key: @object_key, object_attributes: ["Checksum"])
     decode_checksum(resp.checksum.checksum_sha256)
@@ -77,7 +77,7 @@ def run_test
   
   puts "Comparing checksums..."
   local_checksum = local_file.calculate_sha256()
-  s3_checksum = S3_Object.new(bucket_name, object_key).get_s3_object_sha256()
+  s3_checksum = S3_Object.new(bucket_name, object_key).get_sha256()
 
   if local_checksum == s3_checksum
     puts "Checksums match!"
